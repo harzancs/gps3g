@@ -6,15 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:google_place/google_place.dart';
 import 'package:gps3g/pages/map/future/positionAPI.dart';
+import 'package:gps3g/pages/map/model/itemsNewsSocial.dart';
 import 'package:gps3g/pages/map/model/itemsPosition.dart';
+import 'package:gps3g/pages/news/newsScreen.dart';
 import 'package:gps3g/system/fonts.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final int mode;
+  const MapScreen({
+    Key? key,
+    required this.mode,
+  }) : super(key: key);
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -36,6 +41,9 @@ class _MapScreenState extends State<MapScreen> {
   double _latitudeEnd = 0.0;
   double _longitudeEnd = 0.0;
   String _nameEnd = "";
+  //----
+  String district = "1.unknow";
+  String province = "1.unknow";
 
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
@@ -172,6 +180,11 @@ class _MapScreenState extends State<MapScreen> {
                   " เมตร");
               if (totalDistance <= 10000) {
                 futurePositionList.add(futurePosition[i]);
+                setState(() {
+                  district = futurePosition[i].DISTRICT;
+                  province = futurePosition[i].PROVINCE;
+                  _getNewsSocial(district, province);
+                });
                 if (futurePosition[i].TYPE == "ระเบิด") {
                   startMarker = Marker(
                       markerId: MarkerId('point{$i}'),
@@ -328,6 +341,12 @@ class _MapScreenState extends State<MapScreen> {
                 }
               }
             }
+          } else {
+            setState(() {
+              district = "unknow";
+              province = "unknow";
+              _getNewsSocial("1.unknow", "1.unknow");
+            });
           }
         });
       });
@@ -341,6 +360,23 @@ class _MapScreenState extends State<MapScreen> {
     // for (int i = 0;i < futurePosition.;i++) {}
     // totalDistance = Geolocator.distanceBetween(
     //     _latitude, _longitude, widget.myLat, widget.myLng);
+  }
+
+  int lenNews = 0;
+  List<ItemsNewsSocial> futureNews = [];
+  List<ItemsNewsSocial> futureNewsList = [];
+  Future<bool> _getNewsSocial(String _district, String _province) async {
+    var _map = {};
+    _map.addAll({"district": _district, "province": _province});
+    print(_map);
+    await PositionApi().apiGetItemsNewsSocial(_map).then((onValue) {
+      setState(() {
+        lenNews = onValue.length;
+        print("จำนวน " + lenNews.toString());
+      });
+    });
+    setState(() {});
+    return true;
   }
 
   runTimePosition() {
@@ -377,9 +413,10 @@ class _MapScreenState extends State<MapScreen> {
     // TODO: implement initState
     super.initState();
     _getLatLongNow();
+    _getNewsSocial(district, province);
     // _getPositionRisk();
     timer =
-        Timer.periodic(Duration(seconds: 60), (Timer t) => runTimePosition());
+        Timer.periodic(Duration(seconds: 300), (Timer t) => runTimePosition());
     // _getPolyline();
   }
 
@@ -585,6 +622,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
+            Container(),
             _hiddenGo
                 ? SlidingUpPanel(
                     panel: Container(
@@ -719,7 +757,71 @@ class _MapScreenState extends State<MapScreen> {
                       ),
                     ),
                   )
-                : Container()
+                : Container(),
+            widget.mode == 2
+                ? Positioned(
+                    top: 100,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewsSocial(
+                              district: district,
+                              province: province,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.import_contacts_rounded,
+                              color: Colors.white,
+                              size: 36,
+                            ),
+                            decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.green.shade600,
+                                    Colors.green.shade300,
+                                  ],
+                                ),
+                                shape: BoxShape.circle),
+                          ),
+                          lenNews > 0
+                              ? Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(5),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      lenNews > 9 ? "9+" : lenNews.toString(),
+                                      style: TextStyle(
+                                        fontFamily: FontFamilys.fontFamily,
+                                        fontSize: 10,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),

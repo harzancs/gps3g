@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_webservice/places.dart';
 
 class MapSearch extends StatefulWidget {
   const MapSearch({Key? key}) : super(key: key);

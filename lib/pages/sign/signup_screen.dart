@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:gps3g/pages/map/map.dart';
+import 'package:gps3g/pages/sign/signin_auto.dart';
 import 'package:gps3g/styles/pageOneStyle.dart';
-import 'package:gps3g/styles/pageStyle.dart';
+import 'package:gps3g/system/api.dart';
 import 'package:gps3g/system/fonts.dart';
+import 'package:http/http.dart' as http;
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -13,6 +16,57 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  //Start-----Text Input
+  TextEditingController _inputFullname = TextEditingController();
+  TextEditingController _inputUsername = TextEditingController();
+  TextEditingController _inputPassword = TextEditingController();
+  TextEditingController _inputRePassword = TextEditingController();
+  TextEditingController _inputEmail = TextEditingController();
+  //End-----Text Input
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  _getData() {
+    var jsonMap = {};
+    jsonMap.addAll({
+      "username": _inputEmail.text,
+      "email": _inputEmail.text,
+      "fullname": _inputFullname.text,
+      "password": _inputRePassword.text
+    });
+    postDRegister(http.Client(), json.encode(jsonMap));
+  }
+
+  Future<String> postDRegister(http.Client client, jsonMap) async {
+    final response = await client.post(Uri.parse(Api.postMember),
+        headers: {"Content-Type": "application/json"}, body: jsonMap);
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    var body = json.decode(response.body);
+    if (body['status'] == 'true') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SignInAuto(
+            username: _inputEmail.text,
+            password: _inputRePassword.text,
+          ),
+        ),
+      );
+    } else {
+      if (body['massage'] == 'username') {
+        _showMyDialog("Email นี้ถูกใช้งานแล้ว");
+      } else {
+        _showMyDialog("Error มีบ้างอย่างปิดพลาด");
+      }
+    }
+
+    setState(() {});
+    return "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return PageOneStyle(
@@ -30,6 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: _inputFullname,
                           keyboardType: TextInputType.text,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
                           decoration: InputDecoration(
@@ -49,6 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         TextFormField(
+                          controller: _inputEmail,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
                           decoration: InputDecoration(
@@ -71,6 +127,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           height: 10,
                         ),
                         TextFormField(
+                          controller: _inputPassword,
                           obscureText: true,
                           keyboardType: TextInputType.visiblePassword,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
@@ -91,6 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         TextFormField(
+                          controller: _inputRePassword,
                           obscureText: true,
                           keyboardType: TextInputType.visiblePassword,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
@@ -123,12 +181,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      if (_formkey.currentState!.validate()) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => MapScreen()),
-                        );
-                      }
+                      if (_inputPassword.text == _inputRePassword.text) {
+                        if (_formkey.currentState!.validate()) {
+                          _getData();
+                        }
+                      } else {}
                     },
                     child: Container(
                       child: Text(
@@ -162,6 +219,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showMyDialog(String text) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: const Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(text),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('ปิด'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

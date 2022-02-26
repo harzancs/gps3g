@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gps3g/pages/map/map.dart';
+import 'package:gps3g/pages/mode/modeScreen.dart';
+import 'package:gps3g/pages/sign/signin_auto.dart';
 import 'package:gps3g/styles/pageOneStyle.dart';
 import 'package:gps3g/styles/pageStyle.dart';
 import 'package:gps3g/system/fonts.dart';
@@ -13,6 +15,13 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  //Start-----Text Input
+  TextEditingController _inputFullname = TextEditingController();
+  TextEditingController _inputUsername = TextEditingController();
+  TextEditingController _inputPassword = TextEditingController();
+  TextEditingController _inputRePassword = TextEditingController();
+  TextEditingController _inputEmail = TextEditingController();
+  //End-----Text Input
   @override
   Widget build(BuildContext context) {
     return PageOneStyle(
@@ -30,6 +39,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Column(
                       children: [
                         TextFormField(
+                          controller: _inputEmail,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
                           decoration: InputDecoration(
@@ -49,6 +59,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           },
                         ),
                         TextFormField(
+                          controller: _inputPassword,
                           obscureText: true,
                           keyboardType: TextInputType.visiblePassword,
                           style: TextStyle(fontFamily: FontFamilys.fontFamily),
@@ -84,7 +95,12 @@ class _SignInScreenState extends State<SignInScreen> {
                       if (_formkey.currentState!.validate()) {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => MapScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => SignInAuto(
+                              username: _inputEmail.text,
+                              password: _inputPassword.text,
+                            ),
+                          ),
                         );
                       }
                     },

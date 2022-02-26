@@ -29,9 +29,12 @@ dependencies:
   location: ^4.3.0
   geolocator: ^8.0.1
   geocoder: ^0.2.1
-  google_maps_webservice: ^0.0.19
+  # google_maps_webservice: any
   http:
   sliding_up_panel: ^2.0.0+1
+  linkwell: ^2.0.6
+  crypto: ^3.0.1
+  shared_preferences:
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gps3g/pages/home/home_screen.dart';
+import 'package:gps3g/pages/home/launch_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -84,6 +85,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return HomeScreen();
+    return LaunchScreen();
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gps3g/pages/map/model/itemsNewsSocial.dart';
 import 'package:gps3g/pages/map/model/itemsPosition.dart';
 import 'package:gps3g/system/api.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,24 @@ class PositionApi {
       // return ItemsPosition.fromJson(jsonDecode(response.body));
       List responseJson = json.decode(response.body);
       return responseJson.map((m) => new ItemsPosition.fromJson(m)).toList();
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
+  }
+
+  Future<List<ItemsNewsSocial>> apiGetItemsNewsSocial(jsonMap) async {
+    final response = await http.post(Uri.parse(Api.getNewsRisk),
+        headers: header, body: json.encode(jsonMap));
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      // return ItemsPosition.fromJson(jsonDecode(response.body));
+      List responseJson = json.decode(response.body);
+      print("NEWS_SOCIAL : " + json.encode(response.body));
+      return responseJson.map((m) => new ItemsNewsSocial.fromJson(m)).toList();
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
