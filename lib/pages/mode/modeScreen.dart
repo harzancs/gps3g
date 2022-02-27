@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gps3g/pages/map/map.dart';
 import 'package:gps3g/pages/sign/signout.dart';
+import 'package:gps3g/pages/sign/update/editprofile_screen.dart';
 import 'package:gps3g/styles/pageMainStyle.dart';
 import 'package:gps3g/system/fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -208,26 +209,73 @@ class _ModeScreenState extends State<ModeScreen> {
 
   Widget drawer(BuildContext context) {
     return Drawer(
-      child: SafeArea(
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: ListTile(
-                    leading: Icon(Icons.person),
-                    title: Text(
-                      fullname,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: FontFamilys.fontFamily,
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                child: Column(
+                  children: [
+                    DrawerHeader(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            colorFilter: ColorFilter.mode(
+                                Colors.black.withOpacity(0.2),
+                                BlendMode.dstATop),
+                            image: AssetImage('assets/images/bg/bg-main.jpg'),
+                            fit: BoxFit.fitWidth),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.green.shade600,
+                            Colors.white,
+                          ],
+                        ),
+                      ),
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.person,
+                          size: 26,
+                        ),
+                        title: Text(
+                          fullname,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: FontFamilys.fontFamily,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.visible,
+                          softWrap: false,
+                        ),
                       ),
                     ),
-                  ),
+                    ListTile(
+                      leading: Icon(Icons.mode_edit_outline_rounded),
+                      title: Text(
+                        "แก้ไขข้อมูลส่วนตัว",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: FontFamilys.fontFamily,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditProfileScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              Container(
+            ),
+            SafeArea(
+              child: Container(
                 child: Column(
                   children: [
                     Divider(),
@@ -255,8 +303,8 @@ class _ModeScreenState extends State<ModeScreen> {
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

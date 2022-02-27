@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -142,13 +140,13 @@ class _MapScreenState extends State<MapScreen> {
         _currentPosition.latitude.toString() +
         ' : ' +
         _currentPosition.longitude.toString());
+    _latitude = _currentPosition.latitude;
+    _longitude = _currentPosition.longitude;
+    if (_latitudedFrist == 0.0 && _longitudeFrist == 0.0) {
+      _latitudedFrist = _currentPosition.latitude;
+      _longitudeFrist = _currentPosition.longitude;
+    }
     setState(() {
-      _latitude = _currentPosition.latitude;
-      _longitude = _currentPosition.longitude;
-      if (_latitudedFrist == 0.0 && _longitudeFrist == 0.0) {
-        _latitudedFrist = _currentPosition.latitude;
-        _longitudeFrist = _currentPosition.longitude;
-      }
       mapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -163,193 +161,189 @@ class _MapScreenState extends State<MapScreen> {
   List<ItemsPosition> futurePosition = [];
   List<ItemsPosition> futurePositionList = [];
   Future<bool> _getPositionRisk() async {
-    await PositionApi().apiGetItemsPosition().then((onValue) {
+    await PositionApi().apiGetItemsPosition().then((onValue) async {
       double totalDistance = 0;
-      setState(() {
-        setState(() async {
-          if (onValue.length > 0) {
-            futurePosition = onValue;
-            for (int i = 0; i < futurePosition.length; i++) {
-              totalDistance = Geolocator.distanceBetween(
-                  _latitude,
-                  _longitude,
-                  double.parse(futurePosition[i].LATITUDE),
-                  double.parse(futurePosition[i].LONGITUDE));
-              print("ตำแหน่งที่ {$i} ห่างที่คุณอยู่ " +
-                  totalDistance.toString() +
-                  " เมตร");
-              if (totalDistance <= 10000) {
-                futurePositionList.add(futurePosition[i]);
-                setState(() {
-                  district = futurePosition[i].DISTRICT;
-                  province = futurePosition[i].PROVINCE;
-                  _getNewsSocial(district, province);
-                });
-                if (futurePosition[i].TYPE == "ระเบิด") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-1.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "ยิง") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-2.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "ก่อกวน") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-3.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "พบศพ") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-4.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "พบระเบิด") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-5.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "ซุ่มโจมตี") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-6.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "วางเพลิง") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-7.png'));
-                  markers.add(startMarker);
-                } else if (futurePosition[i].TYPE == "ตรวจเก็บวัตถุพยาน") {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-8.png'));
-                  markers.add(startMarker);
-                } else {
-                  startMarker = Marker(
-                      markerId: MarkerId('point{$i}'),
-                      position: LatLng(double.parse(futurePosition[i].LATITUDE),
-                          double.parse(futurePosition[i].LONGITUDE)),
-                      infoWindow: InfoWindow(
-                        title: futurePosition[i].TYPE,
-                        snippet: futurePosition[i].RISK +
-                            " - " +
-                            futurePosition[i].DISTRICT +
-                            " " +
-                            futurePosition[i].PROVINCE,
-                      ),
-                      icon: await BitmapDescriptor.fromAssetImage(
-                          ImageConfiguration(size: Size(30, 30)),
-                          'assets/images/icon/icon-9.png'));
-                  markers.add(startMarker);
-                }
-              }
-            }
-          } else {
+      if (onValue.length > 0) {
+        futurePosition = onValue;
+        for (int i = 0; i < futurePosition.length; i++) {
+          totalDistance = Geolocator.distanceBetween(
+              _latitude,
+              _longitude,
+              double.parse(futurePosition[i].LATITUDE),
+              double.parse(futurePosition[i].LONGITUDE));
+          print("ตำแหน่งที่ {$i} ห่างที่คุณอยู่ " +
+              totalDistance.toString() +
+              " เมตร");
+          if (totalDistance <= 10000) {
+            futurePositionList.add(futurePosition[i]);
             setState(() {
-              district = "unknow";
-              province = "unknow";
-              _getNewsSocial("1.unknow", "1.unknow");
+              district = futurePosition[i].DISTRICT;
+              province = futurePosition[i].PROVINCE;
+              _getNewsSocial(district, province);
             });
+            if (futurePosition[i].TYPE == "ระเบิด") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-1.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "ยิง") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-2.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "ก่อกวน") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-3.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "พบศพ") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-4.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "พบระเบิด") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-5.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "ซุ่มโจมตี") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-6.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "วางเพลิง") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-7.png'));
+              markers.add(startMarker);
+            } else if (futurePosition[i].TYPE == "ตรวจเก็บวัตถุพยาน") {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-8.png'));
+              markers.add(startMarker);
+            } else {
+              startMarker = Marker(
+                  markerId: MarkerId('point{$i}'),
+                  position: LatLng(double.parse(futurePosition[i].LATITUDE),
+                      double.parse(futurePosition[i].LONGITUDE)),
+                  infoWindow: InfoWindow(
+                    title: futurePosition[i].TYPE,
+                    snippet: futurePosition[i].RISK +
+                        " - " +
+                        futurePosition[i].DISTRICT +
+                        " " +
+                        futurePosition[i].PROVINCE,
+                  ),
+                  icon: await BitmapDescriptor.fromAssetImage(
+                      ImageConfiguration(size: Size(30, 30)),
+                      'assets/images/icon/icon-9.png'));
+              markers.add(startMarker);
+            }
           }
+        }
+      } else {
+        setState(() {
+          district = "unknow";
+          province = "unknow";
+          _getNewsSocial("1.unknow", "1.unknow");
         });
-      });
+      }
     });
     setState(() {});
     return true;
@@ -530,6 +524,9 @@ class _MapScreenState extends State<MapScreen> {
                                               getDetils(predictionsList[index]
                                                   .placeId
                                                   .toString());
+                                              FocusScope.of(context)
+                                                  .requestFocus(
+                                                      new FocusNode());
                                             },
                                           );
                                         },
@@ -871,14 +868,16 @@ class _MapScreenState extends State<MapScreen> {
           icon: BitmapDescriptor.defaultMarker,
         );
         markers.add(startMarker);
-        mapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(_lat, _long),
-              zoom: 18.0,
+        setState(() {
+          mapController.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(_lat, _long),
+                zoom: 18.0,
+              ),
             ),
-          ),
-        );
+          );
+        });
       });
     }
   }

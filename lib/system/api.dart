@@ -9,6 +9,8 @@ class Api {
   //-----สมาชิก
   static String postMember = _baseUrl + 'member/insertMember';
   static String getMember = _baseUrl + 'member/get/';
+  static String updateMemberProfile = _baseUrl + 'member/updateProfile';
+  static String updateMemberPassword = _baseUrl + 'member/updatePassword';
 
   Api() : super();
 }
